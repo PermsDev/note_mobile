@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="250dp"
+    android:minHeight="100dp"
+    android:updatePeriodMillis="86400000"
+    android:initialLayout="@layout/widget_layout"
+    android:resizeMode="horizontal|vertical"
+    android:widgetCategory="home_screen">
+</appwidget-provider>
+
+<!--<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android">-->
+<!--    &lt;!&ndash; Ukuran Widget &ndash;&gt;-->
+<!--    <minWidth android:value="200"/>-->
+<!--    <minHeight android:value="200"/>-->
+<!--    <updatePeriodMillis android:value="60000"/> &lt;!&ndash; Memperbarui widget setiap 1 menit &ndash;&gt;-->
+<!--    <initialLayout android:layout="@layout/widget_layout"/> &lt;!&ndash; Layout untuk widget &ndash;&gt;-->
+<!--</appwidget-provider>-->
