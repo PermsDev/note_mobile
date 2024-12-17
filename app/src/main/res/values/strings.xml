@@ -6,4 +6,5 @@
     <string name="delete">Hapus</string>
     <string name="date">Date</string>
     <string name="notification_subtext">Reminder</string>
+    <string name="pin">Pin to Widget</string>
 </resources>

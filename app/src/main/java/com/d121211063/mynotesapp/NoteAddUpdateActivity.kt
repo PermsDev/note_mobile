@@ -1,12 +1,17 @@
 package com.d121211063.mynotesapp
 
+import android.app.PendingIntent
+import android.appwidget.AppWidgetManager
+import android.content.ComponentName
 import android.content.ContentValues
+import android.content.Context
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
+import android.widget.RemoteViews
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import com.d121211063.mynotesapp.databinding.ActivityNoteAddUpdateBinding
@@ -63,9 +68,13 @@ class NoteAddUpdateActivity : AppCompatActivity(), View.OnClickListener {
                 binding.edtDescription.setText(it.description)
             }
 
+            binding.btnPin.visibility = View.VISIBLE
+
         } else {
             actionBarTitle = "Tambah"
             btnTitle = "Simpan"
+
+            binding.btnPin.visibility = View.GONE
         }
 
         supportActionBar?.title = actionBarTitle
@@ -74,6 +83,19 @@ class NoteAddUpdateActivity : AppCompatActivity(), View.OnClickListener {
         binding.btnSubmit.text = btnTitle
 
         binding.btnSubmit.setOnClickListener(this)
+
+        binding.btnPin.setOnClickListener {
+            val title = binding.edtTitle.text.toString().trim()
+            val description = binding.edtDescription.text.toString().trim()
+
+            if (title.isNotEmpty() && description.isNotEmpty()) {
+                pinNoteToWidget(title, description)
+                Toast.makeText(this, "Note pinned to widget", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "Please fill in both title and description", Toast.LENGTH_SHORT).show()
+            }
+        }
+
     }
 
     override fun onClick(view: View) {
@@ -100,6 +122,9 @@ class NoteAddUpdateActivity : AppCompatActivity(), View.OnClickListener {
             if (isEdit) {
                 val result = noteHelper.update(note?.id.toString(), values)
                 if (result > 0) {
+                    saveNoteToPreferences(title, description)
+                    updateWidget(this)
+
                     setResult(RESULT_UPDATE, intent)
                     finish()
                 } else {
@@ -172,8 +197,7 @@ class NoteAddUpdateActivity : AppCompatActivity(), View.OnClickListener {
                 } else {
                     val result = noteHelper.deleteById(note?.id.toString()).toLong()
                     if (result > 0) {
-                        val intent = Intent()
-                        intent.putExtra(EXTRA_POSITION, position)
+                        note?.let { deletePinnedNote(it) }
                         setResult(RESULT_DELETE, intent)
                         finish()
                     } else {
@@ -184,5 +208,78 @@ class NoteAddUpdateActivity : AppCompatActivity(), View.OnClickListener {
             .setNegativeButton("Tidak") { dialog, _ -> dialog.cancel() }
         val alertDialog = alertDialogBuilder.create()
         alertDialog.show()
+    }
+
+    private fun pinNoteToWidget(title: String, description: String) {
+        val appWidgetManager = AppWidgetManager.getInstance(this)
+        val remoteViews = RemoteViews(packageName, R.layout.widget_layout)
+        val componentName = ComponentName(this, WidgetProvider::class.java)
+
+        saveNoteToPreferences(title, description)
+
+        // Update widget
+        remoteViews.setTextViewText(R.id.widget_title, title)
+        remoteViews.setTextViewText(R.id.widget_content, description)
+        remoteViews.setViewVisibility(R.id.widget_button, View.GONE)
+        appWidgetManager.updateAppWidget(componentName, remoteViews)
+    }
+
+    private fun saveNoteToPreferences(title: String, description: String) {
+        val sharedPreferences = getSharedPreferences("PinnedNote", Context.MODE_PRIVATE)
+        with(sharedPreferences.edit()) {
+            putString("title", title)
+            putString("description", description)
+            apply()
+        }
+    }
+
+    private fun updateWidget(context: Context) {
+        val appWidgetManager = AppWidgetManager.getInstance(context)
+        val remoteViews = RemoteViews(context.packageName, R.layout.widget_layout)
+        val componentName = ComponentName(context, WidgetProvider::class.java)
+
+        // Get data from SharedPreferences
+        val prefs = context.getSharedPreferences("PinnedNote", Context.MODE_PRIVATE)
+        val title = prefs.getString("title", "No Title")
+        val description = prefs.getString("description", "No Description")
+
+        remoteViews.setTextViewText(R.id.widget_title, title)
+        remoteViews.setTextViewText(R.id.widget_content, description)
+
+        val intent = Intent(context, MainActivity::class.java)
+        val pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+        remoteViews.setOnClickPendingIntent(R.id.widget_button, pendingIntent)
+
+        appWidgetManager.updateAppWidget(componentName, remoteViews)
+    }
+
+    private fun updateWidgetToDefault(context: Context) {
+        val appWidgetManager = AppWidgetManager.getInstance(context)
+        val remoteViews = RemoteViews(context.packageName, R.layout.widget_layout)
+        val componentName = ComponentName(context, WidgetProvider::class.java)
+
+        remoteViews.setTextViewText(R.id.widget_title, "Judul")
+        remoteViews.setTextViewText(R.id.widget_content, "Tidak ada note yang dipilih, pin terlebih dahulu!")
+        remoteViews.setViewVisibility(R.id.widget_button, View.VISIBLE);
+
+        val intent = Intent(context, MainActivity::class.java)
+        val pendingIntent = PendingIntent.getActivity(context, 0, intent, PendingIntent.FLAG_IMMUTABLE)
+        remoteViews.setOnClickPendingIntent(R.id.widget_button, pendingIntent)
+
+        appWidgetManager.updateAppWidget(componentName, remoteViews)
+    }
+
+    private fun deletePinnedNote(note: Note) {
+        val sharedPreferences = getSharedPreferences("PinnedNote", Context.MODE_PRIVATE)
+        val pinnedTitle = sharedPreferences.getString("title", null)
+        val pinnedDescription = sharedPreferences.getString("description", null)
+
+        if (note.title == pinnedTitle && note.description == pinnedDescription) {
+            with(sharedPreferences.edit()) {
+                clear()
+                apply()
+            }
+            updateWidgetToDefault(this)
+        }
     }
 }

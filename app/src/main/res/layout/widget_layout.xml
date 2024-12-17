@@ -1,39 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/widget_container"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
+    android:layout_height="match_parent"
     android:background="#FFFFFF"
-    android:padding="10dp">
+    android:orientation="vertical">
 
     <TextView
-        android:id="@+id/widget_text"
+        android:id="@+id/widget_title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Widget Example"
-        android:textSize="16sp"
+        android:text="@string/title"
+        android:textStyle="bold"
+        android:textColor="#FFFFFF"
+        android:background="#FF6363"
+        android:padding="8dp"
+        android:textSize="16sp" />
+
+    <TextView
+        android:id="@+id/widget_content"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:text="@string/description"
         android:textColor="#000000"
-        android:gravity="center" />
+        android:textSize="14sp"
+        android:padding="8dp" />
 
     <Button
         android:id="@+id/widget_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Click Me"
-        android:layout_gravity="center_horizontal" />
+        android:text="@string/pin"
+        android:layout_gravity="center_horizontal"
+        android:textColor="#000"
+        android:paddingHorizontal="16dp"
+        android:paddingVertical="8dp"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp"
+        android:visibility="visible"/>
 </LinearLayout>
-
-<!--<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
-<!--android:orientation="vertical"-->
-<!--android:gravity="center"-->
-<!--android:layout_width="match_parent"-->
-<!--android:layout_height="match_parent">-->
-
-<!--<TextView-->
-<!--    android:id="@+id/timeText"-->
-<!--    android:layout_width="wrap_content"-->
-<!--    android:layout_height="wrap_content"-->
-<!--    android:text="00:00"-->
-<!--    android:textSize="40sp"-->
-<!--    android:textColor="#000000"/>-->
-<!--</LinearLayout>-->
