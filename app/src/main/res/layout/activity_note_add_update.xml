@@ -21,15 +21,16 @@
     </com.google.android.material.textfield.TextInputLayout>
     <com.google.android.material.textfield.TextInputLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        android:layout_weight="1"
         android:layout_marginBottom="16dp">
         <EditText
             android:id="@+id/edt_description"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:hint="@string/description"
-            android:inputType="textCapSentences"
-            android:maxLines="1" />
+            android:inputType="textMultiLine"
+            android:gravity="start|top" />
     </com.google.android.material.textfield.TextInputLayout>
     <Button
         android:id="@+id/btn_submit"
@@ -37,4 +38,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/submit" />
+    <Button
+        android:id="@+id/btn_pin"
+        style="@style/Base.Widget.AppCompat.Button.Colored"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/pin"
+        android:layout_marginTop="8dp"
+        />
 </LinearLayout>
